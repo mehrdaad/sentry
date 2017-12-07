@@ -64,12 +64,15 @@ def trim(
     }
 
     if _depth > max_depth:
-        return trim(repr(value), _size=_size, max_size=max_size)
+        if not isinstance(value, six.string_types):
+            value = repr(value)
+        return trim(value, _size=_size, max_size=max_size)
 
     elif isinstance(value, dict):
         result = {}
         _size += 2
-        for k, v in six.iteritems(value):
+        for k in sorted(value.keys()):
+            v = value[k]
             trim_v = trim(v, _size=_size, **options)
             result[k] = trim_v
             _size += len(force_text(trim_v)) + 1

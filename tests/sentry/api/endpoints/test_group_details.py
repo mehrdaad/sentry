@@ -267,7 +267,7 @@ class GroupUpdateTest(APITestCase):
 
     def test_mark_seen_as_non_member(self):
         user = self.create_user('foo@example.com', is_superuser=True)
-        self.login_as(user=user)
+        self.login_as(user=user, superuser=True)
 
         group = self.create_group()
 
@@ -326,7 +326,7 @@ class GroupUpdateTest(APITestCase):
         url = '/api/0/issues/{}/'.format(group.id)
 
         with self.tasks():
-            with self.feature('projects:custom-filters'):
+            with self.feature('projects:discard-groups'):
                 resp = self.client.put(
                     url, data={
                         'discard': True,

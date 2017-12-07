@@ -32,7 +32,7 @@
     "gettext-parser": "1.1.1",
     "history": "1.13.0",
     "idx": "^1.5.0",
-    "ios-device-list": "^1.1.17",
+    "ios-device-list": "^1.1.28",
     "jed": "^1.1.0",
     "jquery": "2.1.4",
     "js-cookie": "2.0.4",
@@ -85,6 +85,7 @@
     "test-ci": "npm run test -- --runInBand",
     "test-watch": "npm run test -- --watch",
     "jest": "NODE_ENV=test node_modules/.bin/jest",
+    "jest-debug": "NODE_ENV=test node --inspect-brk node_modules/.bin/jest --runInBand",
     "lint": "node_modules/.bin/eslint tests/js src/sentry/static/sentry/app --ext .jsx",
     "dev-proxy": "node scripts/devproxy.js",
     "dev-server": "webpack-dev-server",
@@ -98,7 +99,7 @@
     "moduleNameMapper": {
       "\\.(css|less)$": "<rootDir>/tests/js/helpers/importStyleMock.js",
       "jquery": "<rootDir>/src/sentry/static/sentry/__mocks__/jquery.jsx",
-      "integration-docs-platforms": "<rootDir>/tests/fixtures/_platforms.json"
+      "integration-docs-platforms": "<rootDir>/tests/fixtures/integration-docs/_platforms.json"
     },
     "modulePaths": [
       "<rootDir>/src/sentry/static/sentry"
@@ -121,17 +122,17 @@
     "@storybook/addon-knobs": "^3.2.10",
     "@storybook/react": "^3.2.11",
     "babel-eslint": "7.2.3",
-    "babel-jest": "^19.0.0",
+    "babel-jest": "21.2.0",
     "chai": "3.4.1",
     "enzyme": "2.9.1",
     "eslint": "4.4.1",
     "eslint-config-prettier": "^2.3.0",
+    "eslint-config-sentry-react": "1.0.4",
     "eslint-import-resolver-webpack": "^0.8.3",
     "eslint-plugin-getsentry": "1.0.0",
     "eslint-plugin-import": "^2.7.0",
-    "eslint-plugin-react": "7.1.0",
-    "jest": "^19.0.2",
-    "phantomjs-prebuilt": "2.1.14",
+    "eslint-plugin-react": "7.4.0",
+    "jest": "21.2.1",
     "prettier": "1.7.4",
     "sinon": "1.17.2",
     "sinon-chai": "2.8.0",

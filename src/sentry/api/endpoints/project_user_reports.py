@@ -11,6 +11,7 @@ from sentry.api.bases.project import ProjectEndpoint
 from sentry.api.serializers import serialize, ProjectUserReportSerializer
 from sentry.api.paginator import DateTimePaginator
 from sentry.models import (Event, EventUser, Group, GroupStatus, UserReport)
+from sentry.signals import user_feedback_received
 from sentry.utils.apidocs import scenario, attach_scenarios
 
 
@@ -129,6 +130,8 @@ class ProjectUserReportsEndpoint(ProjectEndpoint):
                 event_user_id=euser.id if euser else None,
             )
             report = existing_report
+
+        user_feedback_received.send(project=report.project, group=report.group, sender=self)
 
         return Response(serialize(report, request.user, ProjectUserReportSerializer()))
 

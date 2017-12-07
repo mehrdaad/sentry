@@ -31,18 +31,21 @@ _sprintf_placeholder_re = re.compile(
 )
 
 
-def truncatechars(value, arg):
+def truncatechars(value, arg, ellipsis='...'):
+    # TODO (alex) could use unicode ellipsis: u'\u2026'
     """
     Truncates a string after a certain number of chars.
 
     Argument: Number of chars to truncate after.
     """
+    if value is None:
+        return value
     try:
         length = int(arg)
     except ValueError:  # Invalid literal for int().
         return value  # Fail silently.
     if len(value) > length:
-        return value[:length - 3] + '...'
+        return value[:max(0, length - len(ellipsis))] + ellipsis
     return value
 
 
