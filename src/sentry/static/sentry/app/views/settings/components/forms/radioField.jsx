@@ -1,16 +1,14 @@
 import React from 'react';
-
 import InputField from './inputField';
 
 export default class RadioField extends InputField {
-  coerceValue(value) {
-    return value ? true : false;
-  }
-
   onChange = (value, onChange, onBlur, e) => {
-    let newValue = this.coerceValue(!value);
-    onChange(newValue, e);
-    onBlur(newValue, e);
+    onChange(value, e);
+    onBlur(value, e);
+  };
+
+  isSelected = ({value, id}) => {
+    return value ? value === id : id === 0;
   };
 
   render() {
@@ -20,9 +18,15 @@ export default class RadioField extends InputField {
         field={({onChange, onBlur, value, disabled, ...props}) => (
           <div>
             {(props.choices() || []).map(choice => {
+              const {id, name} = choice;
               return (
-                <div key={choice[0]} value={choice[0]}>
-                  {choice[1]}
+                <div
+                  key={id}
+                  value={id}
+                  onClick={this.onChange.bind(this, id, onChange, onBlur)}
+                  style={{fontWeight: this.isSelected({value, id}) ? 'bold' : 'inherit'}}
+                >
+                  {name}
                 </div>
               );
             })}

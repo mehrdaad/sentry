@@ -19,9 +19,9 @@ const forms = [
         type: 'radio',
         label: 'Send Me Workflow Notifications',
         choices: () => [
-          [0, 'Always'],
-          [1, 'Only On Issues I Subscribe To'],
-          [2, 'Never'],
+          {id: 0, name: 'Always'},
+          {id: 1, name: 'Only On Issues I Subscribe To'},
+          {id: 2, name: 'Never'},
         ],
         help: 'E.g. changes in issue assignment, resolution status, and comments.',
       },
