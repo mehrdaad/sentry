@@ -76,7 +76,7 @@ const RadioLineButtonFill = styled.div`
   height: 54%;
   border-radius: 50%;
   background-color: ${p => p.theme.green};
-  ${p => (p.index ? `animation: 0.2s ${growIn} ease` : '')};
+  animation: ${p => (p.animate ? `0.2s ${growIn} ease` : 'none')};
 `;
 
 const RadioLineText = styled.div`
