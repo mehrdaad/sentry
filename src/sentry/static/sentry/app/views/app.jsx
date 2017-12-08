@@ -1,21 +1,21 @@
 /*global __webpack_public_path__ */
 /*eslint no-native-reassign:0 */
-import PropTypes from 'prop-types';
-import React from 'react';
 import $ from 'jquery';
 import Cookies from 'js-cookie';
+import PropTypes from 'prop-types';
+import React from 'react';
 
-import ApiMixin from '../mixins/apiMixin';
-import Alerts from '../components/alerts';
+import {t} from '../locale';
 import AlertActions from '../actions/alertActions';
+import Alerts from '../components/alerts';
+import ApiMixin from '../mixins/apiMixin';
 import ConfigStore from '../stores/configStore';
 import Indicators from '../components/indicators';
 import InstallWizard from './installWizard';
 import LoadingIndicator from '../components/loadingIndicator';
-import OrganizationsLoader from '../components/organizations/organizationsLoader';
 import OrganizationStore from '../stores/organizationStore';
-
-import {t} from '../locale';
+import OrganizationsLoader from '../components/organizations/organizationsLoader';
+import SudoModal from '../components/modals/sudoModal';
 
 if (window.globalStaticUrl) __webpack_public_path__ = window.globalStaticUrl; // defined in layout.html
 
@@ -95,7 +95,13 @@ const App = React.createClass({
       // TODO: Need better way of identifying anonymous pages
       //       that don't trigger redirect
       let pageAllowsAnon = /^\/share\//.test(window.location.pathname);
-      if (jqXHR && jqXHR.status === 401 && !pageAllowsAnon) {
+      if (
+        jqXHR &&
+        jqXHR.status === 401 &&
+        !pageAllowsAnon &&
+        (!jqXHR.responseJSON ||
+          (!jqXHR.responseJSON.sudoRequired && !jqXHR.responseJSON.allowFail))
+      ) {
         Cookies.set('session_expired', 1);
         // User has become unauthenticated; reload URL, and let Django
         // redirect to login page
@@ -135,6 +141,7 @@ const App = React.createClass({
 
     return (
       <OrganizationsLoader>
+        <SudoModal />
         <Alerts className="messages-container" />
         <Indicators className="indicators-container" />
         {this.props.children}
