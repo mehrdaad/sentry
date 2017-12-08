@@ -9,10 +9,6 @@ from .processor import JavaScriptStacktraceProcessor
 from .errormapping import rewrite_exception
 from .errorlocale import translate_exception
 
-import pprint
-
-pp = pprint.PrettyPrinter(indent=2)
-
 
 def preprocess_event(data):
     rewrite_exception(data)
@@ -20,7 +16,6 @@ def preprocess_event(data):
     fix_culprit(data)
     inject_device_data(data)
     generate_modules(data)
-    # pp.pprint(data)
     return data
 
 

@@ -5,7 +5,7 @@ import re
 
 LOCALES_DIR = 'src/sentry/data/error-locale'
 
-translations_lookup_table = []
+translation_lookup_table = set()
 target_locale = {}
 
 for locale in os.listdir(LOCALES_DIR):
@@ -28,11 +28,11 @@ for locale in os.listdir(LOCALES_DIR):
                     translation_regexp.replace(
                         '\%s', '(?P<format_string_data>[a-zA-Z0-9-_\$]+)') + '$'
                 translation_regexp = re.compile(translation_regexp)
-                translations_lookup_table.append((translation_regexp, key))
+                translation_lookup_table.add((translation_regexp, key))
 
 
 def find_translation(message):
-    for translation in translations_lookup_table:
+    for translation in translation_lookup_table:
         translation_regexp, key = translation
         match = translation_regexp.match(message)
 
@@ -68,12 +68,7 @@ def translate_message(original_message):
 
 def translate_exception(data):
     type, message = data['sentry.interfaces.Message']['message'].split(':', 1)
-
-    print('Input: ' + message)
-    print('Output: ' + translate_message(message))
     data['sentry.interfaces.Message']['message'] = type + ': ' + translate_message(message)
 
     for entry in data['sentry.interfaces.Exception']['values']:
-        print('Input: ' + entry['value'])
-        print('Output: ' + translate_message(entry['value']))
         entry['value'] = translate_message(entry['value'])
