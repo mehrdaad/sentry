@@ -1,8 +1,9 @@
 import React from 'react';
-import styled, {keyframes} from 'react-emotion';
+import styled from 'react-emotion';
 import PropTypes from 'prop-types';
 
 import InputField from './inputField';
+import {growIn} from './styled/animations';
 
 class RadioField extends InputField {
   static propTypes = {
@@ -49,15 +50,6 @@ class RadioField extends InputField {
     );
   }
 }
-
-const growIn = keyframes`
-  0% {
-    transform: scale(0);
-  }
-  100% {
-    transform: scale(1);
-  }
-`;
 
 const RadioLineItem = styled.div`
   display: flex;
