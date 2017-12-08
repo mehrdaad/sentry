@@ -26,12 +26,13 @@ class RadioField extends InputField {
         {...this.props}
         field={({onChange, onBlur, value, disabled, ...props}) => (
           <div>
-            {(props.choices() || []).map(choice => {
+            {(props.choices() || []).map((choice, index) => {
               const {id, name} = choice;
               return (
                 <RadioLineItem
                   key={id}
                   onClick={this.onChange.bind(this, id, onChange, onBlur)}
+                  index={index}
                 >
                   <RadioLineButton>
                     {this.isSelected({value, id}) ? (
@@ -54,8 +55,8 @@ class RadioField extends InputField {
 const RadioLineItem = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 0.5em;
   cursor: pointer;
+  margin-top: ${p => (p.index ? '0.5em' : '0')};
 `;
 
 const RadioLineButton = styled.div`
@@ -75,7 +76,7 @@ const RadioLineButtonFill = styled.div`
   height: 54%;
   border-radius: 50%;
   background-color: ${p => p.theme.green};
-  ${p => (p.animate ? `animation: 0.2s ${growIn} ease` : '')};
+  ${p => (p.index ? `animation: 0.2s ${growIn} ease` : '')};
 `;
 
 const RadioLineText = styled.div`
