@@ -41,6 +41,23 @@ const forms = [
   },
 
   {
+    title: 'Deploy Notifications',
+    fields: [
+      {
+        name: 'deployNotifications',
+        type: 'radio',
+        label: 'Send Me Deploy Notifications',
+        choices: () => [
+          {id: 0, name: 'Always'},
+          {id: 1, name: 'Only On Deploys With My Commits'},
+          {id: 2, name: 'Never'},
+        ],
+        help: 'Deploy emails include release, environment and commit overviews.',
+      },
+    ],
+  },
+
+  {
     title: 'My Activity',
     fields: [
       {
