@@ -34,7 +34,9 @@ exports[`ApiNewToken render() renders 1`] = `
       apiMethod="POST"
       cancelLabel="Cancel"
       className="form-stacked api-new-token"
+      errorMessage="Unable to save your changes. Please ensure all fields are valid and try again."
       footerClass="form-actions align-right"
+      hideErrors={false}
       initialData={
         Object {
           "scopes": Array [
@@ -51,6 +53,7 @@ exports[`ApiNewToken render() renders 1`] = `
       onCancel={[Function]}
       onSubmitSuccess={[Function]}
       requireChanges={false}
+      resetOnError={false}
       submitDisabled={false}
       submitLabel="Save Changes"
     >
