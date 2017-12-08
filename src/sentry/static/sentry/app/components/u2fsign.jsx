@@ -6,7 +6,6 @@ import {t} from '../locale';
 
 const U2fSign = React.createClass({
   propTypes: {
-    challengeData: PropTypes.object,
     displayMode: PropTypes.string,
   },
 
@@ -17,10 +16,10 @@ const U2fSign = React.createClass({
   },
 
   render() {
-    const {displayMode} = this.props;
+    const {displayMode, ...props} = this.props;
     return (
       <U2fInterface
-        challengeData={this.props.challengeData}
+        {...props}
         silentIfUnsupported={displayMode === 'sudo'}
         flowMode={'sign'}
       >
