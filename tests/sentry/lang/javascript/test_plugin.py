@@ -240,6 +240,40 @@ class JavascriptIntegrationTest(TestCase):
         assert frame.data['sourcemap'] == 'http://example.com/test.min.js'
 
     @responses.activate
+    def test_error_message_translations(self):
+        data = {
+            'message': 'hello',
+            'platform': 'javascript',
+            'sentry.interfaces.Message': {
+                'message': 'ReferenceError: Impossible de définir une propriété « foo » : objet non extensible'
+            },
+            'sentry.interfaces.Exception': {
+                'values': [
+                    {
+                        'type': 'Error',
+                        'value': 'Příliš mnoho souborů'
+                    },
+                    {
+                        'type': 'Error',
+                        'value': 'foo: wystąpił nieoczekiwany błąd podczas próby uzyskania informacji o metadanych'
+                    }
+                ],
+            }
+        }
+
+        resp = self._postWithHeader(data)
+        assert resp.status_code, 200
+
+        event = Event.objects.get()
+
+        message = event.interfaces['sentry.interfaces.Message']
+        assert message.message == 'ReferenceError: Cannot define property \'foo\': object is not extensible'
+
+        exception = event.interfaces['sentry.interfaces.Exception']
+        assert exception.values[0].value == 'Too many files'
+        assert exception.values[1].value == 'foo: an unexpected failure occurred while trying to obtain metadata information'
+
+    @responses.activate
     def test_sourcemap_source_expansion(self):
         responses.add(
             responses.GET,

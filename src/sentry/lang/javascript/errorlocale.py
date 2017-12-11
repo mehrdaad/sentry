@@ -1,6 +1,8 @@
 from __future__ import absolute_import, print_function
 
+import six
 import os
+import io
 import re
 
 LOCALES_DIR = 'src/sentry/data/error-locale'
@@ -13,7 +15,7 @@ for locale in os.listdir(LOCALES_DIR):
     if not os.path.isfile(fn):
         continue
 
-    with open(fn) as f:
+    with io.open(fn, encoding='utf-8') as f:
         for line in f:
             key, translation = line.split(',', 1)
             translation = translation.strip()
@@ -52,13 +54,29 @@ def format_message(message, data):
 
 
 def translate_message(original_message):
-    original_message = original_message.strip()
-    translation, format_string_data = find_translation(original_message)
+    if not isinstance(original_message, six.string_types):
+        return original_message
+
+    type = None
+    message = original_message.strip()
+
+    # Handle both cases. Just a message and message preceeded with error type
+    # eg. `ReferenceError: foo`, `TypeError: bar`
+    match = re.match('^(?P<type>[a-zA-Z]*Error): (?P<message>.*)', message)
+
+    if match is not None:
+        type = match.groupdict().get('type')
+        message = match.groupdict().get('message')
+
+    translation, format_string_data = find_translation(message)
 
     if translation is None:
         return original_message
     else:
         translated_message = target_locale.get(translation, original_message)
+
+        if type is not None:
+            translated_message = type + ': ' + translated_message
 
         if format_string_data is None:
             return translated_message
@@ -67,8 +85,13 @@ def translate_message(original_message):
 
 
 def translate_exception(data):
-    type, message = data['sentry.interfaces.Message']['message'].split(':', 1)
-    data['sentry.interfaces.Message']['message'] = type + ': ' + translate_message(message)
+    if 'sentry.interfaces.Message' in data:
+        data['sentry.interfaces.Message']['message'] = translate_message(
+            data['sentry.interfaces.Message']['message'])
 
-    for entry in data['sentry.interfaces.Exception']['values']:
-        entry['value'] = translate_message(entry['value'])
+    if 'sentry.interfaces.Exception' in data:
+        for entry in data['sentry.interfaces.Exception']['values']:
+            if 'value' in entry:
+                entry['value'] = translate_message(entry['value'])
+
+    return data
