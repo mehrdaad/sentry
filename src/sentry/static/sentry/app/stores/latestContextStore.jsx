@@ -33,7 +33,7 @@ const LatestContextStore = Reflux.createStore({
 
     // Update only if different
     if (this.state.organization !== org.slug) {
-      this.state.organization = org.slug;
+      this.state.organization = {...org};
     }
 
     this.trigger(this.state);

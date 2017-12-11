@@ -8,7 +8,7 @@ import SentryTypes from '../../../proptypes';
 import SettingsBreadcrumbDivider from './settingsBreadcrumbDivider';
 import SettingsBreadcrumbDropdown from './settingsBreadcrumbDropdown';
 import recreateRoute from '../../../utils/recreateRoute';
-import withOrganizations from '../../../utils/withOrganizations';
+import withLatestContext from '../../../utils/withLatestContext';
 
 const Breadcrumbs = styled.div`
   display: flex;
@@ -44,55 +44,83 @@ const StyledLink = styled(Link)`
   }
 `;
 
-const ProjectCrumb = ({team, organization, params, routes, route, ...props}) => {
-  if (!organization) return null;
+// `organizationDetails` to differeniate from the organization that comes from `OrganizationsStore` which only has
+// a fraction of an org's properties
+const ProjectCrumb = withLatestContext(
+  ({
+    team,
+    organization: latestOrganization,
+    project: latestProject,
+    params,
+    routes,
+    route,
+    ...props
+  }) => {
+    if (!latestOrganization) return null;
 
-  let {teams} = organization;
-  let {projects} = teams.find(({slug}) => slug === team.slug) || {};
-  let hasMenu = projects && projects.length > 1;
+    let {teams} = latestOrganization;
+    let teamFromOrg = (teams && teams.find(({slug}) => slug === team.slug)) || {};
+    let {projects} = teamFromOrg;
 
-  return (
-    <SettingsBreadcrumbDropdown hasMenu={hasMenu} route={route} {...props}>
-      {projects.map(project => (
-        <MenuItem
-          to={recreateRoute(route, {
-            routes,
-            params: {...params, projectId: project.slug},
-          })}
-          active={project.slug === params.projectId}
-          key={project.slug}
-        >
-          {project.name}
-        </MenuItem>
-      ))}
-    </SettingsBreadcrumbDropdown>
-  );
-};
+    if (!projects) return null;
+
+    let hasMenu = projects && projects.length > 1;
+
+    return (
+      <SettingsBreadcrumbDropdown
+        hasMenu={hasMenu}
+        route={route}
+        name={`${teamFromOrg.name} / ${(latestProject && latestProject.name) || ''}`}
+        {...props}
+      >
+        {projects.map(project => (
+          <MenuItem
+            to={recreateRoute(route, {
+              routes,
+              params: {...params, projectId: project.slug},
+            })}
+            active={project.slug === params.projectId}
+            key={project.slug}
+          >
+            {project.name}
+          </MenuItem>
+        ))}
+      </SettingsBreadcrumbDropdown>
+    );
+  }
+);
+
 ProjectCrumb.displayName = 'ProjectCrumb';
 ProjectCrumb.propTypes = {
   team: SentryTypes.Team,
-  organization: SentryTypes.Organization,
+  organizationDetails: SentryTypes.Organization,
   routes: PropTypes.array,
   route: PropTypes.object,
   isLast: PropTypes.bool,
 };
 
 const MENUS = {
-  Organization: withOrganizations(
-    ({organizations, params, routes, route, isLast, ...props}) => {
+  Organization: withLatestContext(
+    ({organizations, organization, params, routes, route, isLast, ...props}) => {
       let hasMenu = organizations.length > 1;
 
       return (
-        <SettingsBreadcrumbDropdown hasMenu={hasMenu} route={route} {...props}>
-          {organizations.map(organization => (
+        <SettingsBreadcrumbDropdown
+          name={organization.name}
+          hasMenu={hasMenu}
+          route={route}
+          {...props}
+        >
+          {organizations.map(org => (
             <MenuItem
               to={recreateRoute(route, {
                 routes,
-                params: {...params, orgId: organization.slug},
+                params: {...params, orgId: org.slug},
               })}
-              key={organization.slug}
+              active={org.slug === params.orgId}
+              key={org.slug}
             >
-              {organization.name}
+              {org.name}
             </MenuItem>
           ))}
         </SettingsBreadcrumbDropdown>
@@ -138,7 +166,6 @@ class SettingsBreadcrumb extends React.Component {
           return (
             <CrumbPicker
               key={`${route.name}:${route.path}`}
-              organization={this.context.organization}
               team={this.context.team}
               routes={routes}
               params={params}
